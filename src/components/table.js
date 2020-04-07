@@ -1,8 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { getUserTypes } from "../api";
+import FormContext from "../contexts/form";
 
-const UsersTable = ({ users, onDeleteUser }) => {
+const UsersTable = () => {
     const [userTypes, setUserTypes] = useState([]);
+    const { users, deleteUser } = useContext(FormContext);
 
     useEffect(() => {
         getUserTypes().then(userTypes => setUserTypes(userTypes));
@@ -13,7 +15,7 @@ const UsersTable = ({ users, onDeleteUser }) => {
         return selectedUserType ? selectedUserType.description : "";
     }, [userTypes]);
 
-    const handleDeleteUser = useCallback(index => () => onDeleteUser(index), [onDeleteUser]);
+    const handleDeleteUser = useCallback(index => () => deleteUser(index), [deleteUser]);
     
     return (<div>
         <h3>Users:</h3>

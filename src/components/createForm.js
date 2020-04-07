@@ -1,52 +1,98 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import styled from "styled-components";
 import { getUserTypes } from "../api";
+import FormContext from "../contexts/form";
 
-const completeForm = (email, name, userType) => email !== "" && name !== "" && userType !== null;
+const StyledInput = styled("input")`
+  border: 1px solid ${({ value }) => (value !== "" ? "green" : "red")};
+`;
+const StyledSelect = styled("select")`
+  border: 1px solid ${({ value }) => (value !== "" ? "green" : "red")};
+`;
+const completeForm = (email, name, userType) =>
+  email !== "" && name !== "" && userType !== "";
 
-const CreateForm = ({ onCreateUser }) => {
-    const [userTypes, setUserTypes] = useState([]);
-    const [email, setEmail] = useState("");
-    const [name, setName] = useState("");
-    const [userType, setUserType] = useState(null);
-    const [active, setActive] = useState(false);
+const CreateForm = () => {
+  const [userTypes, setUserTypes] = useState([]);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [userType, setUserType] = useState("");
+  const [active, setActive] = useState(false);
+  const { addUser } = useContext(FormContext);
 
-    const createUserButtonActive = completeForm(email,name, userType);
+  const createButtonClickHandler = useCallback(
+    () => addUser({ email, name, active, userType }),
+    [addUser, email, name, active, userType]
+  );
 
-    useEffect(() => {
-        getUserTypes().then(userTypes => setUserTypes(userTypes));
-    },[setUserTypes]);
+  const createUserButtonActive = completeForm(email, name, userType);
 
-    return (<div>
-        <h3>Crear usuario:</h3>
-        <label>
-            Email:<br/>
-            <input type="text" value={email} onChange={event => setEmail(event.target.value)} />
-        </label><br/><br/>
-        <label>
-            Name:<br/>
-            <input type="text" value={name} onChange={event => setName(event.target.value)} />
-        </label><br/><br/>
-        <label>
-            User type:<br/>
-            <select onChange={event => setUserType(parseInt(event.target.value, 10))}>
-                { !userType && <option>Select type</option> }
-                { userTypes.map(({ id, description}) => (
-                    <option key={id} value={id}>{description}</option>
-                ))}
-            </select>
-        </label><br/><br/>
-        <label>
-            Active:
-            <input type="checkbox" value={active} onChange={event => setActive(event.target.value)} />
-        </label><br/><br/><br/>
-        <button
-            style={{ opacity: createUserButtonActive ? 1 : 0.3 }}
-            disabled={!createUserButtonActive}
-            onClick={() => onCreateUser({ email, name, active, userType })}
+  useEffect(() => {
+    getUserTypes().then((userTypes) => setUserTypes(userTypes));
+  }, [setUserTypes]);
+
+  return (
+    <div>
+      <h3>Crear usuario:</h3>
+      <label>
+        Email:
+        <br />
+        <StyledInput
+          type="text"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+      </label>
+      <br />
+      <br />
+      <label>
+        Name:
+        <br />
+        <StyledInput
+          type="text"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+        />
+      </label>
+      <br />
+      <br />
+      <label>
+        User type:
+        <br />
+        <StyledSelect
+          onChange={(event) => setUserType(parseInt(event.target.value, 10))}
+          value={userType}
         >
-            Create user
-        </button>
-</div>);
-}
+          {!userType && <option>Select type</option>}
+          {userTypes.map(({ id, description }) => (
+            <option key={id} value={id}>
+              {description}
+            </option>
+          ))}
+        </StyledSelect>
+      </label>
+      <br />
+      <br />
+      <label>
+        Active:
+        <input
+          type="checkbox"
+          value={active}
+          onChange={(event) => setActive(event.target.value)}
+        />
+      </label>
+      <br />
+      <br />
+      <br />
+      <button
+        style={{ opacity: createUserButtonActive ? 1 : 0.3 }}
+        disabled={!createUserButtonActive}
+        onClick={createButtonClickHandler}
+      >
+        Create user
+      </button>
+    </div>
+  );
+};
 
 export default CreateForm;

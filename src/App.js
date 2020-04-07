@@ -1,6 +1,7 @@
 import React, { useCallback, useReducer } from "react";
 import CreateForm from "./components/createForm";
 import UsersTable from "./components/table";
+import FormContext from "./contexts/form";
 import "./styles.css";
 
 const initialState = {users: [], createFormVisible: false };
@@ -35,18 +36,20 @@ export default function App() {
   const showCreateForm = useCallback(() => dispatch({type: actionTypes.SHOW_CREATE_FORM }), [dispatch]);
 
   return (
-    <div className="App">
-      { createFormVisible ? 
-        <CreateForm onCreateUser={addUser} /> :
-        <>
-        { 
-          users.length === 0 ?
-            <p>There are no users introduced.</p> :
-            <UsersTable users={users} onDeleteUser={deleteUser} />
-        }<br/><br/>
-        <button onClick={showCreateForm}>Add new user</button>
-      </> 
-    }
-    </div>
+    <FormContext.Provider value={{ users, addUser, deleteUser }}>
+      <div className="App">
+        { createFormVisible ? 
+          <CreateForm /> :
+          <>
+          { 
+            users.length === 0 ?
+              <p>There are no users introduced.</p> :
+              <UsersTable users={users} onDeleteUser={deleteUser} />
+          }<br/><br/>
+          <button onClick={showCreateForm}>Add new user</button>
+        </> 
+      }
+      </div>
+    </FormContext.Provider>
   );
 }
