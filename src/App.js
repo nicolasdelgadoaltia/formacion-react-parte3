@@ -44,7 +44,7 @@ export default function App() {
           { 
             users.length === 0 ?
               <p>There are no users introduced.</p> :
-              <UsersTable users={users} onDeleteUser={deleteUser} />
+              <UsersTable />
           }<br/><br/>
           <button onClick={showCreateForm}>Add new user</button>
         </> 
